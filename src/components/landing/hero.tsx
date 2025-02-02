@@ -16,7 +16,7 @@ export const Hero = () => {
     <div className="container relative mx-auto flex flex-col gap-4 overflow-hidden py-4 lg:flex-row lg:py-6">
       {/* Left Content */}
       <div className="bite-br flex flex-1 animate-fade-in-left items-center justify-center overflow-hidden rounded-2xl bg-[#f28809] px-4 py-8 sm:rounded-3xl md:px-8 lg:px-16 lg:py-12">
-        <BackgroundShaderClient className="absolute inset-0 z-[-1] h-screen w-screen brightness-95" />
+        {/* <BackgroundShaderClient className="absolute inset-0 z-[-1] h-screen w-screen brightness-95" /> */}
         <div className="flex max-w-3xl flex-col items-center text-center">
           <div className="mb-4 inline-flex animate-fade-in-up-delay-5 items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm transition-transform hover:scale-105 sm:mb-6 sm:px-4 sm:py-2">
             <span className="text-xs font-semibold text-gray-900 sm:text-sm">
