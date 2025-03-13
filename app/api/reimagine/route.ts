@@ -4,14 +4,9 @@ import { auth } from "@/auth";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { fal } from "@fal-ai/client";
 import sharp from "sharp";
-import Together from "together-ai";
 
 fal.config({
   credentials: process.env.FAL_KEY!,
-});
-
-const together = new Together({
-  apiKey: process.env.TOGETHER_API_KEY!,
 });
 
 const s3Client = new S3Client({
