@@ -1,17 +1,17 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
-
- /**
-   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
-   * useful for Docker builds.
-   */
+/**
+ * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
+ * useful for Docker builds.
+ */
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars.
    */
   server: {
+    NEXT_PUBLIC_APP_URL: z.string().url(),
     AUTH_SECRET:
       process.env.NODE_ENV === "production"
         ? z.string()
@@ -22,8 +22,6 @@ export const env = createEnv({
       .default("development"),
     HUME_API_KEY: z.string(),
     HUME_SECRET_KEY: z.string(),
-    TOGETHER_API_KEY: z.string(),
-    OPENAI_API_KEY: z.string(),
     EMAIL_FROM: z.string().email(),
     EMAIL_SERVER_HOST: z.string(),
     EMAIL_SERVER_PORT: z.string(),
@@ -50,20 +48,17 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    AUTH_SECRET: process.env.AUTH_SECRET,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     HUME_API_KEY: process.env.HUME_API_KEY,
     HUME_SECRET_KEY: process.env.HUME_SECRET_KEY,
     NEXT_PUBLIC_HUME_CONFIG_ID: process.env.NEXT_PUBLIC_HUME_CONFIG_ID,
-    TOGETHER_API_KEY: process.env.TOGETHER_API_KEY,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
     EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
     EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT,
     EMAIL_SERVER_USER: process.env.EMAIL_SERVER_USER,
     EMAIL_SERVER_PASSWORD: process.env.EMAIL_SERVER_PASSWORD,
-    REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
     FAL_KEY: process.env.FAL_KEY,
   },
   /**

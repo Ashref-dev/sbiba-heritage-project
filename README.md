@@ -65,10 +65,13 @@ Sbiba (ancient Sufes) stands as a testament to Tunisia's rich multicultural heri
 - [Auth.js v5](https://authjs.dev/) - Authentication
 - [Server Actions](https://nextjs.org/docs/app/api-reference/functions/server-actions) - API Endpoints
 
-### Media & Content
+### Cloud and AI Services
 
-- [Cloudinary](https://cloudinary.com/) - Media Management
-- [MDX](https://mdxjs.com/) - Enhanced Content Authoring
+- [AWS S3](https://aws.amazon.com/s3/) - Media Storage
+- [Azure Communication Services](https://azure.microsoft.com/en-us/services/communication-services/) - Email Delivery
+- [OpenAI](https://openai.com/) - AI for Text Generation
+- [Hume AI](https://www.hume.ai/) - AI for Voice Analysis
+- [FAL AI](https://www.fal.ai/) - AI for Image Generation
 - [Contentlayer](https://contentlayer.dev/) - Content Management
 
 ## Getting Started
