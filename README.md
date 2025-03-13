@@ -9,7 +9,7 @@
   <p align="center">
     Sbiba Heritage Project - Where Ancient Civilizations Meet
     <br>
-    <a href="https://sbiba-heritage.com"><strong>Explore Sbiba »</strong></a>
+    <a href="https://sbiba.vercel.app"><strong>Explore Sbiba »</strong></a>
     <br />
     <br />
 
