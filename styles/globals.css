@@ -96,6 +96,113 @@
   }
 }
 
+/* Animation delays using CSS variables */
+.animate-fade-in-right {
+  animation: fade-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 400ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 500ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-3 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 600ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-4 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 700ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-5 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 800ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-6 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1200ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-left {
+  animation: fade-in-left 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1600ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-7 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2000ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-8 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2100ms forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-9 {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2200ms forwards;
+  opacity: 0;
+}
+
+/* Define keyframes for animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Special animation for header */
+@keyframes fade-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-down-header {
+  animation: fade-down 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2600ms forwards;
+  opacity: 0;
+}
+
 @layer utilities {
   .step {
     counter-increment: step;

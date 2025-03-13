@@ -56,7 +56,7 @@ export function Header({ points, user }: HeaderProps) {
           : "w-[calc(100%-2rem)]"
       } max-w-7xl -translate-x-1/2 rounded-full bg-background/60 backdrop-blur-sm`}
     >
-      <div className="animate-fade-in-up-delay-8 container grid grid-cols-3 items-center px-4 py-2">
+      <div className="container grid grid-cols-3 animate-fade-down-header items-center px-4 py-2">
         {/* Left Navigation - Hidden on Mobile */}
         <div className="hidden md:block">
           <NavigationMenu>

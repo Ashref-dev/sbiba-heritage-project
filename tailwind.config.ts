@@ -183,6 +183,36 @@ const config = {
   					opacity: '1'
   				}
   			},
+  			'fade-in-up': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(20px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
+  			'fade-in-left': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateX(-20px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			'fade-in-right': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateX(20px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
   			'fade-out': {
   				'0%': {
   					opacity: '0'
@@ -218,6 +248,9 @@ const config = {
   			'fade-up': 'fade-up 0.5s forwards',
   			'fade-down': 'fade-down 0.5s forwards',
   			'fade-in': 'fade-in 0.5s forwards',
+  			'fade-in-up': 'fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--animation-delay, 0ms) forwards',
+  			'fade-in-left': 'fade-in-left 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--animation-delay, 0ms) forwards',
+  			'fade-in-right': 'fade-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--animation-delay, 0ms) forwards',
   			'fade-out': 'fade-out 0.5s forwards',
   			marquee: 'marquee var(--duration) infinite linear',
   			'marquee-vertical': 'marquee-vertical var(--duration) linear infinite'
