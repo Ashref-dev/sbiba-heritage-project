@@ -155,7 +155,7 @@ export const Hero = () => {
       </div>
 
       {/* ScrollIndicator - Hidden on mobile, fades in with bottom elements */}
-      <ScrollIndicator className="animate-fade-in-up-delay-6 absolute bottom-0 left-1/2 hidden -translate-x-1/2 lg:left-[55%] lg:block" />
+      <ScrollIndicator className="animate-fade-in-up-delay-6 absolute bottom-0 left-1/2 hidden -translate-x-1/2 lg:left-[52%] lg:block" />
     </div>
   );
 };
