@@ -32,7 +32,10 @@ export async function getSites(): Promise<Site[]> {
             path.join(sitesDirectory, folder),
           );
           const imageFiles = folderContents.filter(
-            (file) => file.endsWith(".jpg") || file.endsWith(".png"),
+            (file) =>
+              file.toLowerCase().endsWith(".jpg") ||
+              file.toLowerCase().endsWith(".jpeg") ||
+              file.toLowerCase().endsWith(".png"),
           );
 
           return {
@@ -43,7 +46,7 @@ export async function getSites(): Promise<Site[]> {
             latitude: 35.54491932642123,
             longitude: 9.074707047696306,
             video: `/sites/${folder}/vid.mp4`,
-            images: [`/sites/${folder}/pic.jpg`],
+            images: imageFiles.map((file) => `/sites/${folder}/${file}`),
           };
         }),
     );
@@ -65,7 +68,10 @@ export async function getSiteById(siteId: string): Promise<Site | null> {
     // Get all images in the folder except vid.mp4
     const folderContents = await fs.readdir(path.join(sitesDirectory, siteId));
     const imageFiles = folderContents.filter(
-      (file) => file.endsWith(".jpg") || file.endsWith(".png"),
+      (file) =>
+        file.toLowerCase().endsWith(".jpg") ||
+        file.toLowerCase().endsWith(".jpeg") ||
+        file.toLowerCase().endsWith(".png"),
     );
 
     return {
@@ -76,7 +82,7 @@ export async function getSiteById(siteId: string): Promise<Site | null> {
       latitude: 35.54491932642123,
       longitude: 9.074707047696306,
       video: `/sites/${siteId}/vid.mp4`,
-      images: [`/sites/${siteId}/pic.jpg`],
+      images: imageFiles.map((file) => `/sites/${siteId}/${file}`),
     };
   } catch (error) {
     console.error(`Error reading site ${siteId}:`, error);
