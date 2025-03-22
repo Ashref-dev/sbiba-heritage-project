@@ -90,8 +90,7 @@ The following environment variables must be set in your `.env` file:
 #### Authentication
 
 - `AUTH_SECRET`: Secret key for authentication
-- `GOOGLE_CLIENT_ID`: Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+
 
 #### Database
 
@@ -99,19 +98,31 @@ The following environment variables must be set in your `.env` file:
 
 #### Media Storage
 
-- `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name
-- `CLOUDINARY_API_KEY`: Cloudinary API key
-- `CLOUDINARY_API_SECRET`: Cloudinary API secret
+- `AWS_ACCESS_KEY_ID`: AWS access key ID
+- `AWS_SECRET_ACCESS_KEY`: AWS secret access key
+- `AWS_REGION`: AWS region
+- `AWS_S3_BUCKET`: AWS S3 bucket name
 
 #### Email
 
-- `RESEND_API_KEY`: API key for Resend email service
 - `EMAIL_FROM`: Sender email address
+- `EMAIL_SERVER_HOST`: Azure Communication Services SMTP host
+- `EMAIL_SERVER_PORT`: Azure Communication Services SMTP port
+- `EMAIL_SERVER_USER`: Azure Communication Services SMTP username
+- `EMAIL_SERVER_PASSWORD`: Azure Communication Services SMTP password
+
+#### AI Services
+
+- `HUME_API_KEY`: Hume AI API key for voice analysis
+- `HUME_SECRET_KEY`: Hume AI secret key
+- `NEXT_PUBLIC_HUME_CONFIG_ID`: Hume AI public configuration ID
+- `FAL_KEY`: FAL AI API key for image generation
+- `REPLICATE_API_TOKEN`: Replicate API token for AI models
+- `TOGETHER_API_KEY`: Together AI API key for text generation
 
 #### Application URLs
 
 - `NEXT_PUBLIC_APP_URL`: Public URL of your application
-- `NEXTAUTH_URL`: Auth.js URL (optional in production)
 
 ### Environment Validation
 

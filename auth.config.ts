@@ -8,16 +8,12 @@ import { env } from "@/env.mjs";
 // It should NOT include nodemailer/Email provider
 export default {
   providers: [
-    Google({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
-    Github({
-      clientId: env.AUTH_GITHUB_ID,
-      clientSecret: env.AUTH_GITHUB_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
+    // Google({
+    //   clientId: env.GOOGLE_CLIENT_ID,
+    //   clientSecret: env.GOOGLE_CLIENT_SECRET,
+
+    // }),
+   
   ],
   pages: {
     signIn: "/sign-in",
