@@ -1,9 +1,10 @@
 "use client";
-import type * as THREE from "three";
+
+import { useRef } from "react";
+import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 // @ts-ignore
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Center } from "@react-three/drei";
-import { useRef } from "react";
+import type * as THREE from "three";
 import { type GLTF } from "three-stdlib";
 
 interface SceneProps {
@@ -21,7 +22,7 @@ type GLTFResult = GLTF & {
 
 function Model({ scrollY }: { scrollY: number }) {
   const meshRef = useRef<THREE.Group>(null);
-  const { scene } = useGLTF("/scene.gltf") as GLTFResult;
+  const { scene } = useGLTF("/scene.gltf") as unknown as GLTFResult;
 
   useFrame(() => {
     if (!meshRef.current) return;

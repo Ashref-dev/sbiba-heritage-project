@@ -2,9 +2,9 @@ import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Upload as IconUpload } from "lucide-react";
 import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 const mainVariant = {
   initial: {
@@ -35,7 +35,6 @@ export const FileUpload = ({
   const [file, setFile] = useState<File | null>(null); // Use a single file state
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const validatePDF = (file: File) => {
     if (file.type !== "application/pdf") {
       toast.error("Please upload a PDF file only");
@@ -48,16 +47,14 @@ export const FileUpload = ({
     const newFile = newFiles[0];
     if (!newFile) return;
     if (validatePDF(newFile)) {
-      setFile(newFile);// Set the first file as the current file
+      setFile(newFile); // Set the first file as the current file
       onChange && onChange([newFile]);
-    }
-    else {
+    } else {
       // Reset input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
-    
   };
 
   const handleClick = () => {
@@ -73,14 +70,14 @@ export const FileUpload = ({
       fileRejections.forEach((rejection) => {
         rejection.errors.forEach((error) => {
           switch (error.code) {
-            case 'file-invalid-type':
-              toast.error('Please upload a PDF file only');
+            case "file-invalid-type":
+              toast.error("Please upload a PDF file only");
               break;
-            case 'file-too-large':
-              toast.error('File is too large');
+            case "file-too-large":
+              toast.error("File is too large");
               break;
             default:
-              toast.error('Error uploading file');
+              toast.error("Error uploading file");
           }
         });
       });
@@ -162,7 +159,7 @@ export const FileUpload = ({
                 layoutId="file-upload"
                 variants={mainVariant}
                 transition={{
-                  type: "sblng",
+                  type: "spring",
                   stiffness: 300,
                   damping: 20,
                 }}

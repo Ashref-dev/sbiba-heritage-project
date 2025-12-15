@@ -1,9 +1,21 @@
+import path from "path";
 import type { NextConfig } from "next";
 import { withContentlayer } from "next-contentlayer2";
 
 import "./env.mjs";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@shadergradient/react"],
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@shadergradient/react": path.resolve(
+        process.cwd(),
+        "node_modules/@shadergradient/react/dist/index.mjs",
+      ),
+    };
+    return config;
+  },
   output: "standalone",
 
   experimental: {
