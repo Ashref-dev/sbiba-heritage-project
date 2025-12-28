@@ -16,7 +16,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Izbet-Sarta-C-26.jpg/640px-Izbet-Sarta-C-26.jpg"
+              src="/images/timeline/izbet-sarta.jpg"
               alt="Ancient Berber settlements"
               width={500}
               height={500}
@@ -37,7 +37,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Tunisie_Carthage_Ruines_08.JPG/640px-Tunisie_Carthage_Ruines_08.JPG"
+              src="/images/timeline/carthage-ruins.jpg"
               alt="Carthaginian period artifacts"
               width={500}
               height={500}
@@ -59,7 +59,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="/img1.jpg"
+              src="/images/timeline/roman-ruins.jpg"
               alt="Roman period ruins"
               width={500}
               height={500}
@@ -80,7 +80,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg"
+              src="/images/timeline/early-islamic-3363341.jpg"
               alt="Early Islamic period artifacts"
               width={500}
               height={500}
@@ -101,7 +101,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://images.pexels.com/photos/4179480/pexels-photo-4179480.jpeg"
+              src="/images/timeline/medieval-fortifications-4179480.jpg"
               alt="Medieval fortifications"
               width={500}
               height={500}
@@ -122,7 +122,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://images.pexels.com/photos/4388164/pexels-photo-4388164.jpeg"
+              src="/images/timeline/ottoman-architecture-4388164.jpg"
               alt="Ottoman period architecture"
               width={500}
               height={500}
@@ -143,7 +143,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg"
+              src="/images/timeline/19th-century-sbiba-4388167.jpg"
               alt="19th century Sbiba"
               width={500}
               height={500}
@@ -165,7 +165,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://images.pexels.com/photos/4388165/pexels-photo-4388165.jpeg"
+              src="/images/timeline/colonial-sbiba-4388165.jpg"
               alt="Colonial period Sbiba"
               width={500}
               height={500}
@@ -188,7 +188,7 @@ export function TimeLineHistory() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Image
-              src="https://nkwazi.s3.eu-west-2.amazonaws.com/wp-content/uploads/2019/11/OPENING-PHOTO-1.jpg"
+              src="/images/timeline/modern-sbiba.jpg"
               alt="Modern Sbiba"
               width={500}
               height={500}
