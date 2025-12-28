@@ -1,10 +1,12 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { format } from "date-fns";
-import { Info, Camera } from "lucide-react";
+import { Camera, Info } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -15,8 +17,6 @@ import { Leaderbord } from "@/components/leaderbord";
 import LikeButton from "@/components/LikeButton";
 import { ShareButton } from "@/components/share-button";
 import AddPost from "@/components/shared/add-post";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function FeedPage() {
   const session = await auth();
@@ -92,7 +92,9 @@ export default async function FeedPage() {
                   <div className="shrink-0">
                     <LikeButton
                       selfieId={selfie.id}
-                      isLiked={userLikes.some((like) => like.selfieId === selfie.id)}
+                      isLiked={userLikes.some(
+                        (like) => like.selfieId === selfie.id,
+                      )}
                     />
                   </div>
                   <div className="shrink-0">
@@ -106,7 +108,7 @@ export default async function FeedPage() {
 
                 <Image
                   src={selfie.imageUrl}
-                  alt={`Selfie by ${selfie.user.name || 'user'}`}
+                  alt={`Selfie by ${selfie.user.name || "user"}`}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -119,7 +121,7 @@ export default async function FeedPage() {
                       {selfie.user.image ? (
                         <Image
                           src={selfie.user.image}
-                          alt={`${selfie.user.name || 'User'}`}
+                          alt={`${selfie.user.name || "User"}`}
                           width={32}
                           height={32}
                           className="rounded-full border border-white/20"
@@ -130,10 +132,15 @@ export default async function FeedPage() {
                         </div>
                       )}
                       <span className="text-sm font-medium text-white">
-                        {selfie.user.name || selfie.user.email?.split('@')[0] || 'Anonymous'}
+                        {selfie.user.name ||
+                          selfie.user.email?.split("@")[0] ||
+                          "Anonymous"}
                       </span>
                     </div>
-                    <time className="text-xs text-white/80" dateTime={selfie.createdAt.toISOString()}>
+                    <time
+                      className="text-xs text-white/80"
+                      dateTime={selfie.createdAt.toISOString()}
+                    >
                       {format(selfie.createdAt, "MMM d, yyyy")}
                     </time>
                   </div>
@@ -162,7 +169,10 @@ function SelfieGridSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="relative aspect-square overflow-hidden rounded-lg">
+        <div
+          key={i}
+          className="relative aspect-square overflow-hidden rounded-lg"
+        >
           <Skeleton className="size-full" />
         </div>
       ))}

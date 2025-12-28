@@ -14,7 +14,6 @@ export const pricingData: SubscriptionPlan[] = [
     ],
     limitations: [
       "Limited to 10 interview generations",
-      "No direct AI interview chat",
       "Basic feedback only",
       "No custom interview focus areas",
     ],
@@ -32,7 +31,6 @@ export const pricingData: SubscriptionPlan[] = [
     description: "For Serious Job Seekers",
     benefits: [
       "Unlimited AI interview generations",
-      "Interactive AI interview chat assistant",
       "Deep-dive feedback analysis",
       "Custom interview focus areas",
       "Question-specific improvement insights",
@@ -72,13 +70,6 @@ export const comparePlans: PlansRow[] = [
     pro: "Advanced",
     tooltip:
       "Detailed insights into your interview performance and improvements",
-  },
-  {
-    feature: "AI Chat Assistant",
-    starter: null,
-    pro: true,
-    tooltip:
-      "Chat directly with AI about specific interview questions and answers",
   },
   {
     feature: "Feedback Analysis",

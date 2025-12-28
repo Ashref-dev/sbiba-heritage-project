@@ -1,10 +1,11 @@
-import { Card } from "@/components/ui/card";
 import Image from "next/image";
-import { format } from "date-fns";
-import { auth } from "@/auth";
-import { ShareButton } from "@/components/share-button";
 import Link from "next/link";
+import { auth } from "@/auth";
+import { format } from "date-fns";
+
 import { getSites } from "@/lib/get-sites";
+import { Card } from "@/components/ui/card";
+import { ShareButton } from "@/components/share-button";
 
 export default async function FeedPage() {
   const session = await auth();
@@ -15,16 +16,24 @@ export default async function FeedPage() {
     <main className="container mx-auto mt-16 px-4 py-8 md:py-12">
       <div className="mb-8">
         <h1 className="text-2xl font-bold md:text-3xl">Monuments of Sbiba</h1>
-        <p className="mt-2 text-muted-foreground">Explore historical monuments in the Sbiba region</p>
+        <p className="mt-2 text-muted-foreground">
+          Explore historical monuments in the Sbiba region
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {sites.map((site) => (
-          <Link key={site.id} href={`/sites/${site.id}`} className="block h-full">
+          <Link
+            key={site.id}
+            href={`/sites/${site.id}`}
+            className="block h-full"
+          >
             <Card className="group relative h-full overflow-hidden transition-all duration-300 hover:shadow-lg">
               <div className="p-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="line-clamp-1 text-xl font-medium">{site.name}</h2>
+                  <h2 className="line-clamp-1 text-xl font-medium">
+                    {site.name}
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     {format(new Date(), "MMM d, yyyy")}
                   </p>
@@ -56,7 +65,9 @@ export default async function FeedPage() {
         {sites.length === 0 && (
           <div className="col-span-full flex min-h-[200px] items-center justify-center rounded-lg border border-dashed p-8">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">No monuments found</p>
+              <p className="text-sm text-muted-foreground">
+                No monuments found
+              </p>
             </div>
           </div>
         )}

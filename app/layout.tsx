@@ -2,18 +2,17 @@ import "@/styles/globals.css";
 
 import { type Metadata } from "next";
 import {
-    fontGeist,
-    fontHeading,
-    fontPlayfair,
-    fontSans,
-    fontUrban,
+  fontGeist,
+  fontHeading,
+  fontPlayfair,
+  fontSans,
+  fontUrban,
 } from "@/assets/fonts";
 import { auth } from "@/auth";
 import { Toaster } from "sonner";
 
 import { prisma } from "@/lib/db";
 import { ToastProvider } from "@/components/ui/toast";
-import Assistant from "@/components/shared/assistant";
 import Footer from "@/components/shared/footer";
 import { Header } from "@/components/shared/header";
 
@@ -87,9 +86,8 @@ export default async function RootLayout({
       <body>
         <ToastProvider>
           <Header user={user} points={points} />
-          <Assistant />
           {children}
-          <Toaster richColors />
+          <Toaster position="bottom-center" richColors />
           <Footer />
         </ToastProvider>
       </body>

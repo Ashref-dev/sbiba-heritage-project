@@ -1,14 +1,16 @@
 "use client";
-import { Coins, Menu } from "lucide-react";
-import Link from "next/link";
+
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Coins, Menu } from "lucide-react";
+import { signOut } from "next-auth/react";
+
 import { Button } from "@/components/ui/button";
 import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuList,
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { signOut } from "next-auth/react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface HeaderProps {
@@ -56,7 +58,7 @@ export function Header({ points, user }: HeaderProps) {
           : "w-[calc(100%-2rem)]"
       } max-w-7xl -translate-x-1/2 rounded-full bg-background/60 backdrop-blur-sm`}
     >
-      <div className="container grid grid-cols-3 animate-fade-down-header items-center px-4 py-2">
+      <div className="animate-fade-down-header container grid grid-cols-3 items-center px-4 py-2">
         {/* Left Navigation - Hidden on Mobile */}
         <div className="hidden md:block">
           <NavigationMenu>
@@ -129,7 +131,7 @@ export function Header({ points, user }: HeaderProps) {
               </div>
               <Button
                 variant="link"
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="hidden text-sm text-primary sm:inline-flex"
               >
                 Sign Out

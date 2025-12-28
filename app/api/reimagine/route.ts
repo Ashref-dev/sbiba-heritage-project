@@ -2,12 +2,10 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { fal } from "@fal-ai/client";
 import sharp from "sharp";
 
-fal.config({
-  credentials: process.env.FAL_KEY!,
-});
+const HF_TOKEN = process.env.HF_TOKEN;
+const MODEL = "stabilityai/stable-diffusion-xl-base-1.0";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
     // Convert the image to buffer
     const imageBuffer = await imageResponse.arrayBuffer();
 
-    // Use Sharp to convert the image to PNG format for Fal AI compatibility
+    // Use Sharp to convert the image to PNG format for Hugging Face compatibility
     const pngBuffer = await sharp(Buffer.from(imageBuffer))
       .png({ quality: 90 })
       .toBuffer();
@@ -65,47 +63,47 @@ export async function POST(request: Request) {
       setTimeout(() => reject(new Error("Request timeout")), 500000),
     );
 
-    const resultPromise = fal.subscribe("fal-ai/flux-pro/v1.1-ultra/redux", {
-      input: {
-        prompt:
-          "Transform this selfie into a vibrant scene set in Sbiba, Tunisia, around 0-500 AC, while preserving the facial features and gender of the person in the uploaded photo. The image should feature a lush landscape with ancient mountains and fertile valleys, reminiscent of the Kasserine region. Dress the subject in traditional attire from that era, influenced by Berber and ancient Mediterranean cultures, using colorful woven fabrics and ornamental jewelry that reflect the individual's style. Surround the subject with elements of daily life such as people engaged in farming, pottery making, or trading in a bustling marketplace. Incorporate historical features like stone structures or megalithic monuments, mirroring the architectural styles of the time. Keep the human elements from the uploaded photo as intact as possible.",
-        num_images: 1,
-        enable_safety_checker: true,
-        safety_tolerance: "2",
-        output_format: "png",
-        aspect_ratio: "16:9",
-        image_url: pngUrl,
-        image_prompt_strength: 0.8,
+    const resultPromise = fetch(`https://router.huggingface.co/hf-inference/models/${MODEL}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json",
       },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (update.status === "IN_PROGRESS") {
-          update.logs.map((log) => log.message).forEach(console.log);
-          console.log("in queue 🚀");
-        }
-      },
+      body: JSON.stringify({
+        inputs: {
+          prompt: "Transform this selfie into a vibrant scene set in Sbiba, Tunisia, around 0-500 AC, while preserving the facial features and gender of the person in the uploaded photo. The image should feature a lush landscape with ancient mountains and fertile valleys, reminiscent of the Kasserine region. Dress the subject in traditional attire from that era, influenced by Berber and ancient Mediterranean cultures, using colorful woven fabrics and ornamental jewelry that reflect the individual's style. Surround the subject with elements of daily life such as people engaged in farming, pottery making, or trading in a bustling marketplace. Incorporate historical features like stone structures or megalithic monuments, mirroring the architectural styles of the time. Keep the human elements from the uploaded photo as intact as possible.",
+          image: pngUrl,
+          strength: 0.8,
+          guidance_scale: 7.5,
+          num_inference_steps: 20,
+        },
+        parameters: {
+          num_inference_steps: 20,
+          guidance_scale: 7.5,
+        },
+      }),
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Hugging Face API error: ${response.statusText}`);
+      }
+      const buffer = await response.arrayBuffer();
+      return { data: { images: [{ url: `data:image/png;base64,${Buffer.from(buffer).toString('base64')}` }] } };
     });
 
     // Race between timeout and actual request
-    const result = await Promise.race([resultPromise, timeoutPromise]);
-    // @ts-expect-error fal returns a different type than together
+    const result = await Promise.race([resultPromise, timeoutPromise]) as { data: { images: [{ url: string }] } };
     if (!result || !result.data?.images?.[0]?.url) {
       throw new Error("No image generated");
     }
-    // @ts-expect-error fal returns a different type than together
     const imageUrl = result.data.images[0].url;
     const key = randomUUID();
 
-    // Fetch with timeout
-    const generatedImageResponse = await fetch(imageUrl);
-    if (!generatedImageResponse.ok) {
-      throw new Error("Failed to fetch generated image");
-    }
-
-    const generatedBuffer = await generatedImageResponse.arrayBuffer();
+    // Convert base64 data URL to buffer
+    const base64Data = imageUrl.split(',')[1];
+    const generatedBuffer = Buffer.from(base64Data, 'base64');
 
     // Optimize the generated image to JPG format
-    const optimizedBuffer = await sharp(Buffer.from(generatedBuffer))
+    const optimizedBuffer = await sharp(generatedBuffer)
       .jpeg({
         quality: 85,
         mozjpeg: true,

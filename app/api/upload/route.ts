@@ -1,8 +1,18 @@
+import { auth } from "@/auth";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
+import rateLimit from "@/lib/rate-limit";
+
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 500, // Max 500 users per minute
+});
+
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
+  endpoint: process.env.AWS_S3_ENDPOINT,
+  forcePathStyle: true,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -21,6 +31,17 @@ interface UploadResult {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    try {
+      await limiter.check(10, session.user.id || "anonymous"); // 10 uploads per minute
+    } catch {
+      return new Response("Rate limit exceeded", { status: 429 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
@@ -52,7 +73,7 @@ export async function POST(request: Request) {
 
     await s3Client.send(new PutObjectCommand(uploadParams));
 
-    const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    const url = `${process.env.AWS_S3_ENDPOINT}/${process.env.AWS_S3_BUCKET}/${key}`;
 
     return new Response(JSON.stringify({ url }), { status: 200 });
   } catch (error: unknown) {

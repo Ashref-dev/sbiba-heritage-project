@@ -48,11 +48,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "nkwazi.s3.eu-west-2.amazonaws.com",
+        hostname: "s3.ashref.tn",
       },
       {
         protocol: "https",
-        hostname: "enlace-freelance.s3.eu-central-1.amazonaws.com",
+        hostname: "nkwazi.s3.eu-west-2.amazonaws.com",
       },
     ],
   },

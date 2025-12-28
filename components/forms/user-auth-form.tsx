@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "next-auth/react";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
 
 export function UserAuthForm() {
   const [email, setEmail] = useState("");
@@ -22,24 +23,26 @@ export function UserAuthForm() {
     try {
       const result = await signIn("nodemailer", {
         email,
-        redirect: false
+        callbackUrl: "/",
+        redirect: false,
       });
 
       if (result?.error) {
         toast.error("Failed to send login email", {
-          description: "Please try again or contact support if the issue persists.",
-          icon: <AlertCircle className="size-5 text-red-500" />
+          description:
+            "Please try again or contact support if the issue persists.",
+          icon: <AlertCircle className="size-5 text-red-500" />,
         });
       } else {
         toast.success("Magic link sent!", {
           description: `We've sent a login link to ${email}. Please check your inbox.`,
-          icon: <CheckCircle className="size-5 text-green-500" />
+          icon: <CheckCircle className="size-5 text-green-500" />,
         });
       }
     } catch (error) {
       toast.error("Something went wrong", {
         description: "Please try again later.",
-        icon: <AlertCircle className="size-5 text-red-500" />
+        icon: <AlertCircle className="size-5 text-red-500" />,
       });
     } finally {
       setIsLoading(false);
@@ -76,4 +79,4 @@ export function UserAuthForm() {
       </Button>
     </div>
   );
-} 
+}

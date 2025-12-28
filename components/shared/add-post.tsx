@@ -1,23 +1,31 @@
 "use client";
 
-import React from "react";
-import {
-    Dialog,
-    DialogTitle,
-    DialogHeader,
-    DialogContent,
-    DialogTrigger, DialogFooter
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Download, SparklesIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useImageUpload } from "@/hooks/use-image-upload";
-import { ImagePlus, X, Upload, Trash2 } from "lucide-react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
-import { useCallback, useState } from "react";
-import { cn } from "@/lib/utils";
 import { postPic } from "@/actions/post-pic";
+import {
+  Download,
+  ImagePlus,
+  SparklesIcon,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
+
+import { cn } from "@/lib/utils";
+import { useImageUpload } from "@/hooks/use-image-upload";
+import { Input } from "@/components/ui/input";
+
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 const AddPost = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -91,9 +99,9 @@ const AddPost = () => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to upload image');
+        throw new Error(error.message || "Failed to upload image");
       }
-      
+
       const data = await response.json();
 
       const reimagineResponse = await fetch("/api/reimagine", {
@@ -103,14 +111,16 @@ const AddPost = () => {
 
       if (!reimagineResponse.ok) {
         const error = await reimagineResponse.json();
-        throw new Error(error.message || 'Failed to reimagine image');
+        throw new Error(error.message || "Failed to reimagine image");
       }
 
       const reimagineData = await reimagineResponse.json();
       setResult(reimagineData.url);
     } catch (error) {
       console.error("Error uploading image:", error);
-      toast.error(error instanceof Error ? error.message : 'Failed to process image');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to process image",
+      );
     } finally {
       setIsLoading(false);
     }

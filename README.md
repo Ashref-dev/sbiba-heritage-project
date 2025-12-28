@@ -116,7 +116,7 @@ The following environment variables must be set in your `.env` file:
 - `HUME_API_KEY`: Hume AI API key for voice analysis
 - `HUME_SECRET_KEY`: Hume AI secret key
 - `NEXT_PUBLIC_HUME_CONFIG_ID`: Hume AI public configuration ID
-- `FAL_KEY`: FAL AI API key for image generation
+- `HF_TOKEN`: Hugging Face API token for image generation
 - `REPLICATE_API_TOKEN`: Replicate API token for AI models
 - `TOGETHER_API_KEY`: Together AI API key for text generation
 
