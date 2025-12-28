@@ -2,12 +2,15 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import sharp from "sharp";
+
+import { makePrompt } from "@/lib/reimagine";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
       });
     }
     const body = await request.json();
-    const { url } = body;
+    const { url, gender = "prefer_not_to_say", square = true } = body;
 
     // Extract S3 key from URL formats:
     // - http://localhost:9000/sbiba-bucket/uploads/1234567890.jpg -> uploads/1234567890.jpg
@@ -42,6 +45,8 @@ export async function POST(request: Request) {
     // - uploads/1234567890.jpg (relative path) -> uploads/1234567890.jpg
 
     let key: string;
+    // Save source key so we can delete the original upload after a successful generation if configured
+    let sourceKey: string | null = null;
 
     try {
       const urlObj = new URL(url);
@@ -62,6 +67,9 @@ export async function POST(request: Request) {
     if (!key) {
       throw new Error("Failed to extract S3 key from URL");
     }
+
+    // Store original source key for optional deletion later
+    sourceKey = key;
 
     const maskedKey = key.length > 16 ? `...${key.slice(-12)}` : key;
     console.log("S3 Key extracted (masked):", maskedKey); // Debug log (masked to avoid leaking full keys)
@@ -101,112 +109,113 @@ export async function POST(request: Request) {
     );
 
     // Resize PNG to limit payload size for HF and send inline as a data URL
-    const resizedPngBuffer = await sharp(pngBuffer)
-      .resize({ width: 1024, withoutEnlargement: true })
-      .png({ quality: 90 })
-      .toBuffer();
+    // If client requested square output, send a centered square crop to the model
+    const resizeTransformer = sharp(pngBuffer).png({ quality: 90 });
+    const resizedPngBuffer = square
+      ? await resizeTransformer
+          .resize({
+            width: 1024,
+            height: 1024,
+            fit: "cover",
+            position: "center",
+          })
+          .toBuffer()
+      : await resizeTransformer
+          .resize({ width: 1024, withoutEnlargement: true })
+          .toBuffer();
 
     const pngDataUrl = `data:image/png;base64,${resizedPngBuffer.toString("base64")}`;
     console.log(
       "Hugging Face payload image size (bytes):",
       resizedPngBuffer.length,
+      "(square:",
+      square,
+      ")",
     );
 
-    const payload = {
-      inputs: {
-        prompt:
-          "Transform this selfie into a vibrant scene set in Sbiba, Tunisia, around 0-500 AC, while preserving the facial features and gender of the person in the uploaded photo. The image should feature a lush landscape with ancient mountains and fertile valleys, reminiscent of the Kasserine region. Dress the subject in traditional attire from that era, influenced by Berber and ancient Mediterranean cultures, using colorful woven fabrics and ornamental jewelry that reflect the individual's style. Surround the subject with elements of daily life such as people engaged in farming, pottery making, or trading in a bustling marketplace. Incorporate historical features like stone structures or megalithic monuments, mirroring the architectural styles of the time. Keep the human elements from the uploaded photo as intact as possible.",
-        image: pngDataUrl,
-        strength: 0.8,
-      },
-      parameters: {
-        num_inference_steps: 20,
-        guidance_scale: 7.5,
-      },
-    };
-
-    const resultPromise = fetch(
-      `https://router.huggingface.co/hf-inference/models/${MODEL}`,
+    // Try models: SDXL-base-1.0 (text-to-image)
+    const modelCandidates = [
       {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        id: "stabilityai/stable-diffusion-xl-base-1.0",
+        name: "SDXL-base-1.0",
       },
-    ).then(async (response) => {
-      const contentType = response.headers.get("content-type") || "";
+    ];
 
-      // Read body as arrayBuffer for image/binary responses, otherwise as text
-      let text = "";
+    // Applied rules: append-gender-to-prompt, enforce-square-output (if requested), delete-source-image-after-success
+    console.log(
+      "Rules applied: append-gender-to-prompt, enforce-square-output, delete-source-image-after-success",
+    );
+
+    const callModel = async (modelId: string) => {
+      const payload = {
+        inputs: makePrompt(gender),
+        parameters: {
+          num_inference_steps: 20,
+          guidance_scale: 7.5,
+        },
+      };
+
+      console.log(`Trying ${modelId} with text prompt`);
+
+      const response = await fetch(
+        `https://router.huggingface.co/hf-inference/models/${modelId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${HF_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const contentType = response.headers.get("content-type") || "";
+      const text = contentType.includes("application/json")
+        ? await response.text()
+        : "";
       let arrBuf: ArrayBuffer | null = null;
       if (
         contentType.includes("image/") ||
         contentType.includes("application/octet-stream")
-      ) {
+      )
         arrBuf = await response.arrayBuffer();
-      } else {
-        text = await response.text();
-      }
 
       if (!response.ok) {
-        // Try to surface the error body for better debugging
-        let errMsg = "";
-        try {
-          if (arrBuf) {
-            // try to decode as utf-8 text if possible
-            errMsg = Buffer.from(arrBuf).toString("utf8");
-          } else {
-            const parsed = JSON.parse(text);
-            errMsg = parsed.error || parsed.detail || JSON.stringify(parsed);
-          }
-        } catch (e) {
-          errMsg = arrBuf ? `<binary data ${arrBuf.byteLength} bytes>` : text;
-        }
-        console.error(
-          "Hugging Face not ok:",
+        const errBody = arrBuf
+          ? Buffer.from(new Uint8Array(arrBuf)).toString("utf8")
+          : text;
+        console.warn(
+          `Model ${modelId} failed:`,
           response.status,
           response.statusText,
-          "body:",
-          errMsg,
+          errBody.slice?.(0, 200) ?? errBody,
         );
-        throw new Error(
-          `Hugging Face API error: ${response.status} ${response.statusText} - ${errMsg}`,
-        );
+
+        if (response.status === 429 || response.status >= 500) {
+          throw new Error(`rate_or_server:${response.status}`);
+        }
+
+        throw new Error("model_failed");
       }
 
-      // If response is an image bytes
-      if (
-        contentType.includes("image/") ||
-        contentType.includes("application/octet-stream")
-      ) {
-        const buffer = Buffer.from(arrBuf!);
-        console.log("Hugging Face returned image bytes, size:", buffer.length);
-        return {
-          data: {
-            images: [
-              {
-                url: `data:${contentType};base64,${buffer.toString("base64")}`,
-              },
-            ],
-          },
-        };
+      // Success: image bytes?
+      if (arrBuf) {
+        const buffer = Buffer.from(new Uint8Array(arrBuf));
+        console.log(
+          `Model ${modelId} returned image bytes, size: ${buffer.length}`,
+        );
+        return { contentType, buffer };
       }
 
-      // If JSON, try to extract image data
+      // Try parse JSON for base64
       if (contentType.includes("application/json")) {
         const json = JSON.parse(text);
-        // Check several common places where HF returns image data
-        // 1) array of base64 strings
-        if (Array.isArray(json)) {
-          if (typeof json[0] === "string") {
-            return {
-              data: { images: [{ url: `data:image/png;base64,${json[0]}` }] },
-            };
-          }
+        if (Array.isArray(json) && typeof json[0] === "string") {
+          return {
+            contentType: "image/png",
+            buffer: Buffer.from(json[0], "base64"),
+          };
         }
-        // 2) object with images or generated_images
         const b64 =
           json?.images?.[0]?.b64_json ||
           json?.generated_images?.[0]?.b64_json ||
@@ -214,18 +223,49 @@ export async function POST(request: Request) {
           json?.data?.[0];
         if (typeof b64 === "string") {
           return {
-            data: { images: [{ url: `data:image/png;base64,${b64}` }] },
+            contentType: "image/png",
+            buffer: Buffer.from(b64, "base64"),
           };
         }
-
-        throw new Error(
-          `Unexpected JSON from HF: ${JSON.stringify(json).slice(0, 512)}`,
-        );
       }
 
-      throw new Error(
-        `Unexpected content-type from Hugging Face: ${contentType}`,
-      );
+      // Unexpected response
+      console.warn(`Model ${modelId} returned unexpected response`);
+      throw new Error("unsupported_response");
+    };
+
+    // Attempt models in order, handling rate limits by trying the next
+    let finalResult: { contentType: string; buffer: Buffer } | null = null;
+
+    for (const model of modelCandidates) {
+      try {
+        console.log(`Attempting model ${model.name} (${model.id})`);
+        finalResult = await callModel(model.id);
+        if (finalResult) {
+          console.log(`Model ${model.name} succeeded`);
+          break;
+        }
+      } catch (err: any) {
+        const msg = String(err?.message || err);
+        console.warn(`Model ${model.name} failed: ${msg}`);
+        // rate_or_server indicates 429/5xx; try next model
+        if (msg.startsWith("rate_or_server:")) continue;
+        // unsupported_image_or_no_result or others: try next model
+        continue;
+      }
+    }
+
+    if (!finalResult) {
+      throw new Error("No model generated an image");
+    }
+
+    // Normalize to former return shape
+    const buffer = finalResult.buffer;
+    const contentType = finalResult.contentType;
+    const dataUrl = `data:${contentType};base64,${buffer.toString("base64")}`;
+
+    const resultPromise = Promise.resolve({
+      data: { images: [{ url: dataUrl }] },
     });
 
     // Race between timeout and actual request
@@ -242,16 +282,33 @@ export async function POST(request: Request) {
     const base64Data = imageUrl.split(",")[1];
     const generatedBuffer = Buffer.from(base64Data, "base64");
 
+    // If square output was requested, center-crop and resize to 1024x1024 before validating
+    let bufferToValidate: Buffer = generatedBuffer;
+    if (square) {
+      try {
+        bufferToValidate = await sharp(generatedBuffer)
+          .resize({
+            width: 1024,
+            height: 1024,
+            fit: "cover",
+            position: "center",
+          })
+          .toBuffer();
+      } catch (err) {
+        console.error("Failed to apply square crop to generated image:", err);
+      }
+    }
+
     // Validate generated buffer before piping to sharp
     try {
-      await sharp(generatedBuffer).metadata();
+      await sharp(bufferToValidate).metadata();
     } catch (err) {
       // Log diagnostics for easier debugging
-      const header = generatedBuffer.slice(0, 16).toString("hex");
+      const header = bufferToValidate.slice(0, 16).toString("hex");
       console.error("Generated buffer metadata failed:", err);
       console.error(
         "Buffer length:",
-        generatedBuffer.length,
+        bufferToValidate.length,
         "header(hex):",
         header,
       );
@@ -285,7 +342,7 @@ export async function POST(request: Request) {
     }
 
     // Optimize the generated image to JPG format
-    const optimizedBuffer = await sharp(generatedBuffer)
+    const optimizedBuffer = await sharp(bufferToValidate)
       .jpeg({
         quality: 85,
         mozjpeg: true,
@@ -316,18 +373,37 @@ export async function POST(request: Request) {
     );
     const uploadUrl = signedUrl;
 
-    // Clean up temporary PNG file
+    // Clean up temporary PNG file (delete) and optionally delete the user's original upload for privacy
     try {
       await s3Client.send(
-        new PutObjectCommand({
+        new DeleteObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET!,
           Key: tempKey,
-          Body: Buffer.from(""),
-          ContentLength: 0,
         }),
       );
     } catch (cleanupError) {
       console.error("Failed to clean up temporary file:", cleanupError);
+    }
+
+    // Optionally delete the original uploaded image to honor user privacy
+    try {
+      const shouldDeleteOriginal =
+        process.env.REIMAGINE_DELETE_ORIGINAL !== "false";
+      if (shouldDeleteOriginal && sourceKey) {
+        const maskedSource =
+          sourceKey.length > 16 ? `...${sourceKey.slice(-12)}` : sourceKey;
+        await s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET!,
+            Key: sourceKey,
+          }),
+        );
+        console.log(
+          `Deleted original uploaded object: ${maskedSource} (rule: delete-source-image-after-success)`,
+        );
+      }
+    } catch (delErr) {
+      console.error("Failed to delete original uploaded image:", delErr);
     }
 
     revalidatePath("/");

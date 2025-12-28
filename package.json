@@ -18,7 +18,9 @@
     "build:content": "contentlayer2 build",
     "test:s3": "bun run scripts/test-s3.ts",
     "test:hf": "bun run scripts/test-hf.ts",
-    "test:services": "bun run scripts/test-services.ts"
+    "test:services": "bun run scripts/test-services.ts",
+    "test:makeprompt": "bun run scripts/test-makeprompt.ts",
+    "test:reimagine-delete": "bun run scripts/test-reimagine-delete.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
