@@ -67,6 +67,41 @@ async function testHuggingFaceConnection() {
 
     console.log("🎉 Hugging Face API test completed successfully!");
 
+    // --- Additional image-to-image test using an inline PNG ---
+    console.log("\n🔁 Now testing image-to-image (img2img) using a small generated PNG...");
+    const sharp = require('sharp');
+    const tinyPng = await sharp({ create: { width: 64, height: 64, channels: 3, background: { r: 240, g: 240, b: 240 } } }).png().toBuffer();
+    const tinyDataUrl = `data:image/png;base64,${Buffer.from(tinyPng).toString('base64')}`;
+
+    const imgResponse = await fetch(`https://router.huggingface.co/hf-inference/models/${MODEL}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${HF_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: {
+          prompt: 'A small, stylized Mediterranean town scenery',
+          image: tinyDataUrl,
+        },
+        parameters: { num_inference_steps: 20, guidance_scale: 7.5, img2img_strength: 0.8 },
+      }),
+    });
+
+    const imgCt = imgResponse.headers.get('content-type') || '';
+    if (!imgResponse.ok) {
+      const err = await imgResponse.text();
+      throw new Error(`Image-to-image HF error: ${imgResponse.status} ${imgResponse.statusText} - ${err}`);
+    }
+
+    if (imgCt.includes('image/')) {
+      const b = await imgResponse.arrayBuffer();
+      console.log(`✅ Img2img success - received image (${b.byteLength} bytes)`);
+    } else {
+      const t = await imgResponse.text();
+      console.log('⚠️ Img2img unexpected response:', t.slice(0, 400));
+    }
+
   } catch (error) {
     console.error("❌ Hugging Face API test failed:", error);
     process.exit(1);

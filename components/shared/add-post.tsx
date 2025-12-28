@@ -6,11 +6,12 @@ import { postPic } from "@/actions/post-pic";
 import {
   Download,
   ImagePlus,
-  SparklesIcon,
   Trash2,
   Upload,
   X,
 } from "lucide-react";
+import SbibaSun from "@/components/icons/SbibaSun";
+import Loader from "@/components/ui/Loader";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -155,20 +156,30 @@ const AddPost = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="group" onClick={() => setOpen(true)}>
-          <SparklesIcon className="size-4 transition-transform duration-300 group-hover:scale-110" />
+        <Button className="group inline-flex items-center gap-2" onClick={() => setOpen(true)}>
+          <SbibaSun className="size-4 transition-transform duration-300 group-hover:scale-110" />
           <span>Reimagine</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader className="mb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <SparklesIcon className="size-6" />
-            Reimagine your selfie as you were in sbiba
+          <DialogTitle className="flex items-center gap-3">
+            <SbibaSun className="size-7 text-amber-600" />
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold">Reimagine your selfie</span>
+              <span className="text-xs text-muted-foreground">See yourself in Sbiba, historically inspired</span>
+            </div>
           </DialogTitle>
         </DialogHeader>
         {!result ? (
-          <div className="w-full max-w-md space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="w-full max-w-md space-y-6 rounded-xl border border-border bg-card p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-medium">Slide or click to upload</h3>
+                <p className="text-sm text-muted-foreground">Upload your selfie and see how it would look like in Sbiba (JPG, PNG)</p>
+              </div>
+              <div className="text-xs text-muted-foreground">Tip: use a clear headshot</div>
+            </div>
             <div className="space-y-2">
               <h3 className="text-lg font-medium">Slide or click to upload</h3>
               <p className="text-sm text-muted-foreground">
@@ -217,13 +228,14 @@ const AddPost = () => {
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                   <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                     <Button
                       size="sm"
                       variant="secondary"
                       onClick={handleThumbnailClick}
                       className="h-9 w-9 p-0"
+                      aria-label="Replace image"
                     >
                       <Upload className="h-4 w-4" />
                     </Button>
@@ -232,6 +244,7 @@ const AddPost = () => {
                       variant="destructive"
                       onClick={handleRemove}
                       className="h-9 w-9 p-0"
+                      aria-label="Remove image"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -243,6 +256,7 @@ const AddPost = () => {
                     <button
                       onClick={handleRemove}
                       className="ml-auto rounded-full p-1 hover:bg-muted"
+                      aria-label="Remove file"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -262,42 +276,49 @@ const AddPost = () => {
             />
           </div>
         )}
-        <DialogFooter>
-          {result && (
-            <Button onClick={handleDownload} variant="outline">
-              <Download className="mr-1 h-4 w-4" />
-              Download
-            </Button>
-          )}
-          {result ? (
-            <Button onClick={() => postImage(result)}>
-              {isLoading ? (
-                <>
-                  <SparklesIcon className="mr-1 h-4 w-4 animate-spin" />
-                  Posting...
-                </>
-              ) : (
-                <>
-                  <SparklesIcon className="mr-1 h-4 w-4" />
-                  Post
-                </>
-              )}
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              onClick={handleUpload}
-              disabled={!file || isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <SparklesIcon className="mr-2 h-4 w-4 animate-spin" />
-                  Reimagining...
-                </>
-              ) : (
-                "Upload"
-              )}
-            </Button>
+        <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+          <div className="flex gap-2">
+            {result && (
+              <Button onClick={handleDownload} variant="outline">
+                <Download className="mr-1 h-4 w-4" />
+                Download
+              </Button>
+            )}
+            {result && (
+              <Button onClick={() => postImage(result)}>
+                {isLoading ? (
+                  <>
+                    <Loader size={18} />
+                    <span className="ml-2">Posting...</span>
+                  </>
+                ) : (
+                  <>
+                    <SbibaSun className="mr-1 h-4 w-4" />
+                    Post
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+
+          {!result && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground mr-2">{fileName}</span>
+              <Button
+                type="submit"
+                onClick={handleUpload}
+                disabled={!file || isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader size={18} />
+                    <span>Reimagining...</span>
+                  </div>
+                ) : (
+                  "Upload"
+                )}
+              </Button>
+            </div>
           )}
         </DialogFooter>
       </DialogContent>
