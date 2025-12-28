@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function Loader({ size = 48 }: { size?: number }) {
   const s = size;

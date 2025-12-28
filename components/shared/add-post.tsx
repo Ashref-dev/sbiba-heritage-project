@@ -4,11 +4,11 @@ import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { postPic } from "@/actions/post-pic";
 import {
-  Download,
-  ImagePlus,
-  Trash2,
-  Upload,
-  X,
+    Download,
+    ImagePlus,
+    Trash2,
+    Upload,
+    X,
 } from "lucide-react";
 import SbibaSun from "@/components/icons/SbibaSun";
 import Loader from "@/components/ui/Loader";
@@ -20,12 +20,12 @@ import { Input } from "@/components/ui/input";
 
 import { Button } from "../ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "../ui/dialog";
 
 const AddPost = () => {

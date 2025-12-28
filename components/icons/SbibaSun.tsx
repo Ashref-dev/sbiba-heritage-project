@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function SbibaSun({ className = 'h-6 w-6' }: { className?: string }) {
   return (
