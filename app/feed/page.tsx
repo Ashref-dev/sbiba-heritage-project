@@ -3,6 +3,7 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import { format } from "date-fns";
 import { Camera, Info } from "lucide-react";
+import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { Card } from "@/components/ui/card";
@@ -20,6 +21,11 @@ import AddPost from "@/components/shared/add-post";
 
 export default async function FeedPage() {
   const session = await auth();
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
   const userId = session?.user?.id;
   const selfies = await prisma.selfie.findMany({
     orderBy: {
